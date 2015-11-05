@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/links/db" VERSION="2013081900" COMMENT="XMLDB file for Moodle local/links" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+    <TABLES>
+        <TABLE NAME="links_entry" COMMENT="Main Links Table.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="name"/>
+                <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" PREVIOUS="id" NEXT="typeid"/>
+                <FIELD NAME="typeid" TYPE="char" LENGTH="255" NOTNULL="true" PREVIOUS="name" NEXT="link"/>
+                <FIELD NAME="link" TYPE="text" LENGTH="1000" NOTNULL="true" PREVIOUS="typeid" NEXT="color"/>
+                <FIELD NAME="colorhead" TYPE="text" LENGTH="7" NOTNULL="false" PREVIOUS="link" NEXT="image"/>
+                <FIELD NAME="colormenu" TYPE="text" LENGTH="7" NOTNULL="false" PREVIOUS="link" NEXT="image"/>
+                <FIELD NAME="coloroptional" TYPE="text" LENGTH="7" NOTNULL="false" PREVIOUS="link" NEXT="image"/>
+                <FIELD NAME="image" TYPE="int" LENGTH="10" NOTNULL="true" PREVIOUS="link" NEXT="icon"/>
+                <FIELD NAME="icon" TYPE="int" LENGTH="10" NOTNULL="false" PREVIOUS="image" NEXT="description"/>
+                <FIELD NAME="description" TYPE="text" LENGTH="1000" NOTNULL="false" PREVIOUS="icon" NEXT="timecreated"/>
+                <FIELD NAME="timecreated" TYPE="int"  LENGTH="10"  NOTNULL="true" PREVIOUS="link"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        
+        <TABLE NAME="category_image" COMMENT="set an image per category.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="categoryid"/>
+                <FIELD NAME="categoryid" TYPE="int" LENGTH="10" NOTNULL="true" PREVIOUS="id" NEXT="link"/>
+                <FIELD NAME="image" TYPE="int" LENGTH="10" NOTNULL="true" PREVIOUS="link" NEXT="timecreated"/>
+                <FIELD NAME="timecreated" TYPE="int"  LENGTH="10"  NOTNULL="true" PREVIOUS="image"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        
+        <TABLE NAME="type_link" COMMENT="">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="name"/>
+                <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" PREVIOUS="id" NEXT="timecreated"/>
+                <FIELD NAME="timecreated" TYPE="int"  LENGTH="10"  NOTNULL="true" PREVIOUS="name"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+    </TABLES>
+</XMLDB>
