@@ -28,7 +28,7 @@ Class links_Model{
         
         $sql = "SELECT l.name,l.link,l.icon,l.image
 				FROM {links_entry} l
-                WHERE t.name = ?
+                WHERE l.name = ?
 				LIMIT 1";
 
 		$params = array($empresa);
@@ -47,7 +47,7 @@ Class links_Model{
         echo '</pre>';*/
     	$sql = "SELECT l.colormenu,l.coloroptional,l.timecreated
 				FROM {links_entry} l
-                WHERE t.name = ?
+                WHERE l.name = ?
 				 LIMIT 1";
 
 
