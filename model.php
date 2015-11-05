@@ -45,7 +45,7 @@ Class links_Model{
         echo '<pre>';
         echo print_r($USER->profile['empresa']);
         echo '</pre>';*/
-    	$sql = "SELECT l.colormenu,l.coloroptional,l.timecreated
+    	$sql = "SELECT l.colormenu,l.coloroptional,l.colorhead
 				FROM {links_entry} l
                 WHERE l.name = ?
 				 LIMIT 1";
