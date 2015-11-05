@@ -53,7 +53,7 @@ Class links_Model{
 
 		$params = array($empresa);
 
-		$result = $this->db->get_records_sql($sql,$params);
+		$result = $this->db->get_record_sql($sql,$params);
 
 		
 		return $result;
