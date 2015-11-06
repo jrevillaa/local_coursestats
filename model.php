@@ -55,6 +55,12 @@ Class links_Model{
 
 		$result = $this->db->get_record_sql($sql,$params);
 
+		if(!is_object($result)){
+			$result = new stdClass();
+			$result->colorhead = '#1797C3';
+			$result->coloroptional = '#484747';
+			$result->colormenu = '#06498A';
+		}
 		
 		return $result;
     }
