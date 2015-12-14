@@ -1,74 +1,97 @@
 <?php
 
-function local_links_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
-    // Check the contextlevel is as expected - if your plugin is a block, this becomes CONTEXT_BLOCK, etc.
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 
-    if ($context->contextlevel != CONTEXT_SYSTEM) {
-        return false; 
-    }
+function print_graphic($id){
+	//include('../../../config.php');
+    //global $CFG;
+    global $USER;
+    global $DB;
+	$output = '';
 
-    if ($filearea !== 'image' && $filearea !== 'icon' && $filearea !== 'category_image'){
-        return false;
-    }
+	$keys = array_keys($USER->profile);
 
-    $itemid = array_shift($args);
- 
-    $filename = array_pop($args); // The last item in the $args array.
-    if (!$args) {
-        $filepath = '/'; // $args is empty => the path is '/'
-    } else {
-        $filepath = '/'.implode('/', $args).'/'; // $args contains elements of the filepath
-    }
- 
-    // Retrieve the file from the Files API.
-    $fs = get_file_storage();
-    $file = $fs->get_file($context->id, 'local_links', $filearea, $itemid, $filepath, $filename);
-    if (!$file) {
-        return false; 
-        
-    }
-    send_stored_file($file, 86400, 0, $forcedownload, $options);
+	$list = explode(PHP_EOL,$DB->get_record('user_info_field',  array('categoryid' =>  1))->param1);
+
+	$total_alumnos = 0;
+	$rand = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f');
+    	
+   //hazme un favor se que pronto vas a enamorarla
+   
+
+	/*$output .= '<div id="canvas-holder">';
+	$output .= '<canvas id="chart-area" width="450" height="450"/>';
+	$output .= '</div>';*/
+
+	//tabala leyenda
+	$output .= '';
+	
+
+	foreach ($list as $value) {
+		
+		$sql_group = "SELECT  mdl_user.username, mdl_user_info_data.data FROM mdl_course 
+		INNER JOIN mdl_context ON mdl_context.instanceid = mdl_course.id 
+		INNER JOIN mdl_role_assignments ON mdl_context.id = mdl_role_assignments.contextid 
+		INNER JOIN mdl_role ON mdl_role.id = mdl_role_assignments.roleid 
+		INNER JOIN mdl_user ON mdl_user.id = mdl_role_assignments.userid 
+		INNER JOIN mdl_user_info_data ON mdl_user_info_data.userid = mdl_role_assignments.userid 
+		WHERE mdl_role.id = 5 AND mdl_course.id = $id AND mdl_user_info_data.data = '$value'" ;
+
+		$data = $DB->get_records_sql($sql_group);
+		$temp = $DB->get_record('links_entry',  array('name' => $value));
+		//print_r($temp);
+		if(is_object($temp)){
+			$info[$value] = array(count($data), $temp->colorhead);
+		}else{
+			$color = '#'.$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)];
+			$info[$value] =  array(count($data), $color);	
+		}
+			$total_alumnos += $info[$value][0];
+
+	} 
+
+	array_multisort($info,SORT_DESC);
+
+	$leyenda = html_writer::start_tag('ul', array('class'=>'leyenda'));
+	foreach ($info as $key=>$value) {
+		if($value[0] > 0){
+			$leyenda .= html_writer::start_tag('li');
+
+			$leyenda .= html_writer::tag('span', '', array('class'=>'color', 'style'=>'background:'.$value[1].';'));
+			$leyenda .= html_writer::tag('span', $key . ': ' . $value[0] , array('class'=>'name'));
+
+			$leyenda .= html_writer::end_tag('li');
+		}
+	}
+
+	$leyenda .= html_writer::start_tag('li', array('class'=>'total-alumnos'));
+	$leyenda .= html_writer::tag('span', 'TOTAL: ' . $total_alumnos, array('class'=>'name bold'));
+	$leyenda .= html_writer::end_tag('li');
+
+	$leyenda .= html_writer::end_tag('ul');
+
+	//$output .= '<script type="text/vbscript" src="js/Chart.js"></script>';
+	$output .= '<script>';
+	$output .= 'var pieData = [';
+	foreach ($info as $key => $value) {
+		if($value[0] > 0){
+			$output .= '{';
+			$output .= 'value:' . $value[0] . ',';
+			$output .= 'color:"' . $value[1] . '",';
+			$output .= 'highlight: "#FF5A5E",';
+			$output .= 'label: "' . $key . '"';
+			$output .= '},';
+		}
+	}
+	$output .= '];';
+	$output .= 'window.onload = function(){';
+	
+	$output .= 'document.getElementsByClassName("programs")[0].innerHTML += \'' . $leyenda . '\';';
+	$output .= 'var ctx = document.getElementById("chart-area").getContext("2d");';
+	$output .= 'window.myPie = new Chart(ctx).Doughnut(pieData);';
+	$output .= '};';
+	$output .= '</script>';
+
+	echo $output;
 }
 
-
-function print_links($total = 10,$title = '',$class=''){
-    global $CFG;
-   require('model.php');
-
-
-    $model = new links_Model();
-    $links = $model->get_links($total);
-
-    $class = 'main-links '.$class;
-
-    echo html_writer::start_tag('div',array('class'=> $class));
-
-    if(!empty($title)) echo html_writer::tag('h1',$title);
-
-    foreach($links as $n){
-
-        $n->image = $model->get_image($n->image);
-        $uri = $CFG->wwwroot.'/pluginfile.php/'.$n->image->contextid.'/'.$n->image->component.'/'.$n->image->filearea.'/'.$n->image->itemid.'/'.$n->image->filename;
-
-        $view = new moodle_url('/local/links/view.php',array('id'=>$n->id));
-        
-        echo html_writer::start_tag('div',array('class'=> 'row-link'));
-
-            echo html_writer::start_tag('div',array('class'=> 'link-link'));
-                echo html_writer::tag('h2',$n->title);
-            echo html_writer::end_tag('div');
-
-            echo html_writer::start_tag('div',array('class'=> 'link-image'));
-                echo html_writer::empty_tag('img',array('src'=>$uri));
-            echo html_writer::end_tag('div');
-
-            echo html_writer::start_tag('div',array('class'=> 'link-view'));
-                echo html_writer::tag('a',get_string('view','local_link'),array('href'=>$view));
-            echo html_writer::end_tag('div');
-
-        echo html_writer::end_tag('div');
-
-    }
-
-    echo html_writer::end_tag('div');
-}

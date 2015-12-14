@@ -1,20 +1,30 @@
 <?php
-/*defined('MOODLE_INTERNAL') || die;
-
-if ($hassiteconfig && isset($ADMIN)) {
-    include_once realpath(dirname(__FILE__)) . '/lib/base.php';
-    moo_links::set_adminsettings($ADMIN);
-}*/
-
-$settings = null;
 
 defined('MOODLE_INTERNAL') || die;
 
-if ($hassiteconfig) {
 
-    $taindex = new admin_externalpage('addlinks', "Add Links", "$CFG->wwwroot/local/links/index.php",
-        'moodle/site:config');
-        $ADMIN->add('localplugins',new admin_category('links','Links'));
-        $ADMIN->add('links', $taindex);
-}
+//********
 
+//ingreso no ingreso
+//actividades califica
+
+//informes-partcipacion en el curso
+//reporte de notas
+//URGENE
+
+
+//INSCRIIPCIONES
+/*
+* el tema de las inscripciones.
+* Drupal entra y se inscribe.
+* Sin condicional para inscribir usuarios, cuotas
+* Ver la ñloginca de lectura de csv
+* Enviar el wsdl de notas
+* wsdl de usuarios.
+* enviar un modelo de json
+*  Emitir certificado desde Moodle
+* Plugin de certifica aulavirtual.ucic.pe
+* Proges bar para aula.inlider.com.pe
+*/
+
+//Reporte de david
